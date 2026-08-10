@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adam — Home Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink-deep: #E64980;
+    --pink-mid: #FF8FAE;
+    --pink-soft: #FFD6E4;
+    --blush: #FFF3F7;
+    --white: #FFFFFF;
+    --ink: #3A2430;
+    --ink-soft: #8C6A78;
+    --error: #D9376E;
+    --gray-bg: #FAF8F9;
+    --border: #F3D3E0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--gray-bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .brand span { color: var(--pink-deep); }
+
+  .nav-actions{ display: flex; align-items: center; gap: 8px; }
+  .chat-btn{
+    display: flex; align-items: center; gap: 6px;
+    background: var(--blush); border: 1.5px solid var(--border); color: var(--pink-deep);
+    padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 700;
+    cursor: pointer; text-decoration: none;
+  }
+  .chat-btn:hover{ background: var(--pink-soft); }
+  .chat-btn svg{ width: 16px; height: 16px; stroke: var(--pink-deep); fill: none; stroke-width: 2; }
+
+  .user-profile-badge { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--pink-soft); color: var(--pink-deep);
+    font-family: 'Fraunces', serif; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0; overflow: hidden;
+  }
+  .avatar img{ width:100%; height:100%; object-fit:cover; }
+  .user-name { font-size: 14px; font-weight: 600; }
+  .settings-link{
+    display:flex; align-items:center; justify-content:center;
+    width: 34px; height: 34px; border-radius: 50%;
+    color: var(--ink-soft); text-decoration:none;
+  }
+  .settings-link:hover{ background: var(--blush); color: var(--pink-deep); }
+  .settings-link svg{ width:17px; height:17px; stroke:currentColor; fill:none; stroke-width:2; }
+  .logout-btn{
+    background: none; border: 1.5px solid var(--border); color: var(--ink-soft);
+    padding: 7px 14px; border-radius: 10px; font-size: 12.5px; font-weight: 600;
+    cursor: pointer; margin-left: 4px;
+  }
+  .logout-btn:hover{ background: var(--blush); color: var(--pink-deep); border-color: var(--pink-deep); }
+
+  .layout {
+    max-width: 1100px; width: 100%; margin: 24px auto; padding: 0 20px 60px;
+    display: grid; grid-template-columns: 260px 1fr; gap: 24px;
+  }
+
+  .sidebar { display: flex; flex-direction: column; gap: 20px; }
+  .card { background: var(--white); border-radius: 16px; padding: 20px; border: 1px solid var(--border); }
+  .sidebar h3 { font-family: 'Fraunces', serif; font-size: 16px; margin-bottom: 12px; color: var(--ink); }
+  .group-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; min-height: 20px; }
+  .group-item {
+    display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--ink-soft);
+    padding: 8px 8px; border-radius: 10px; cursor: pointer;
+  }
+  .group-item:hover{ background: var(--blush); color: var(--ink); }
+  .empty-hint{ font-size: 12.5px; color: var(--ink-soft); padding: 4px 0 12px; }
+  .btn-outline {
+    width: 100%; padding: 10px; border: 1.5px solid var(--pink-deep); background: transparent;
+    color: var(--pink-deep); font-weight: 600; border-radius: 10px; cursor: pointer;
+    font-size: 13px; transition: all 0.15s ease;
+  }
+  .btn-outline:hover { background: var(--blush); }
+  .btn-outline:disabled{ opacity: 0.5; cursor: not-allowed; }
+
+  .feed { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+  .create-post textarea {
+    width: 100%; border: 1.5px solid var(--border); background: var(--blush); border-radius: 12px;
+    padding: 12px 14px; font-family: inherit; font-size: 14px; color: var(--ink);
+    resize: none; height: 80px; outline: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .create-post textarea:focus { border-color: var(--pink-deep); background: var(--white); }
+
+  .create-post-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; gap: 10px; }
+  .media-actions { display: flex; gap: 8px; }
+  .btn-attach {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px;
+    background: var(--blush); color: var(--ink-soft); border: 1px solid var(--border);
+    border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: not-allowed;
+  }
+
+  .btn-primary {
+    padding: 10px 20px; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, var(--pink-deep), var(--pink-mid));
+    color: #fff; font-size: 13.5px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 12px -3px rgba(230,73,128,0.4);
+  }
+  .btn-primary:disabled{ opacity: 0.5; cursor: not-allowed; box-shadow:none; }
+
+  .post-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 10px; }
+  .author-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .author-name { font-weight: 600; font-size: 14px; }
+  .post-time { font-size: 12px; color: var(--ink-soft); }
+  .shared-tag{ font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+  .btn-delete {
+    background: none; border: none; color: var(--ink-soft); font-size: 12px;
+    cursor: pointer; padding: 6px 10px; border-radius: 6px; flex-shrink: 0;
+  }
+  .btn-delete:hover { color: var(--error); background: #FFF0F3; }
+  .post-content { font-size: 14.5px; line-height: 1.5; margin-bottom: 12px; word-wrap: break-word; }
+
+  .post-actions-bar { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; flex-wrap: wrap; }
+  .btn-reaction {
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px;
+    background: var(--blush); border: 1px solid var(--border); border-radius: 20px;
+    font-size: 13px; font-weight: 600; color: var(--ink-soft); cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-reaction:hover { background: var(--pink-soft); color: var(--pink-deep); }
+  .btn-reaction.active-like { background: var(--pink-deep); color: #ffffff; border-color: var(--pink-deep); }
+
+  .comments-wrapper { border-top: 1px solid var(--border); padding-top: 12px; }
+  .comment-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+  .comment-item { display: flex; gap: 8px; background: var(--blush); padding: 8px 12px; border-radius: 10px; font-size: 13px; word-wrap: break-word; }
+  .comment-author { font-weight: 600; color: var(--ink); flex-shrink: 0; }
+  .add-comment { display: flex; gap: 8px; }
+  .add-comment input { flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px; outline: none; min-width: 0; }
+  .add-comment input:focus { border-color: var(--pink-deep); }
+  .btn-comment { padding: 8px 14px; border: none; background: var(--pink-deep); color: #fff; border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+
+  .status-banner{ text-align: center; font-size: 13px; color: var(--ink-soft); padding: 20px; }
+  .status-banner.error{ color: var(--error); }
+
+  .toast{
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color:#fff; padding: 11px 20px; border-radius: 30px;
+    font-size: 13px; font-weight:600; opacity:0; pointer-events:none;
+    transition: all .25s ease; z-index: 200; max-width: 90vw; text-align: center;
+  }
+  .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+  /* Group edit modal */
+  .modal-overlay{
+    position:fixed; inset:0; background: rgba(58,36,48,0.45);
+    display:none; align-items:center; justify-content:center; z-index: 300; padding: 20px;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal{ background:#fff; border-radius:20px; padding: 22px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y:auto; }
+  .modal h3{ font-family:'Fraunces', serif; font-size:18px; margin-bottom: 4px; }
+  .modal .owner-tag{ font-size: 12px; color: var(--ink-soft); margin-bottom: 16px; }
+  .modal label{ display:block; font-size: 12px; font-weight:700; margin: 12px 0 6px; }
+  .modal input, .modal textarea{
+    width:100%; padding: 10px 12px; border-radius:10px; border: 1.5px solid var(--border);
+    background: var(--blush); font-size: 13.5px; font-family: inherit;
+  }
+  .modal input:focus, .modal textarea:focus{ outline:none; border-color: var(--pink-deep); background:#fff; }
+  .modal textarea{ resize: vertical; min-height: 60px; }
+  .member-list{ list-style:none; margin-top: 8px; display:flex; flex-direction:column; gap:6px; }
+  .member-row{ display:flex; align-items:center; justify-content:space-between; padding: 6px 8px; border-radius: 8px; font-size: 13px; }
+  .member-row:hover{ background: var(--blush); }
+  .member-row .owner-badge{ font-size: 10.5px; color: var(--pink-deep); font-weight:700; }
+  .remove-member-btn{ background:none; border:none; color: var(--ink-soft); cursor:pointer; font-size: 12px; }
+  .remove-member-btn:hover{ color: var(--error); }
+  .modal-actions{ display:flex; gap: 10px; margin-top: 20px; }
+  .modal-actions button{ flex:1; padding: 10px; border-radius: 10px; border:none; font-weight:700; font-size: 13px; cursor:pointer; }
+  .modal-save{ background: linear-gradient(135deg, var(--pink-deep), var(--pink-mid)); color:#fff; }
+  .modal-close{ background: var(--blush); color: var(--ink-soft); }
+  .modal-delete{ width:100%; margin-top: 10px; padding: 10px; border-radius: 10px; border: 1.5px solid var(--error); background:#fff; color: var(--error); font-weight:700; font-size:13px; cursor:pointer; }
+
+  @media (max-width: 768px) {
+    .layout { grid-template-columns: 1fr; margin: 16px auto; padding: 0 12px 50px; gap: 16px; }
+    .sidebar{ order: 2; }
+    .feed{ order: 1; }
+    .nav-container{ padding: 10px 14px; }
+    .brand{ font-size: 20px; }
+    .user-name{ display: none; }
+    .chat-btn span{ display: none; }
+    .card{ padding: 16px; border-radius: 14px; }
+    .create-post textarea{ height: 66px; font-size: 13.5px; }
+    .post-content{ font-size: 14px; }
+    .btn-primary{ padding: 9px 16px; }
+    .post-actions-bar{ gap: 8px; }
+    .btn-reaction{ padding: 6px 11px; font-size: 12.5px; }
+  }
+
+  @media (max-width: 420px){
+    .user-name{ display: none; }
+    .avatar{ width: 34px; height: 34px; font-size: 13px; }
+    .brand{ font-size: 18px; }
+    .create-post-footer{ flex-direction: column; align-items: stretch; }
+    .btn-primary{ width: 100%; }
+    .chat-btn{ padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <a href="/dashboard" class="brand">adam<span>.</span></a>
+      <div class="nav-actions">
+        <a href="/chat" class="chat-btn">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-8.4 8.4H4l3-3.2a8.4 8.4 0 1 1 14-5.2z"/></svg>
+          <span>Chat</span>
+        </a>
+        <a href="/settings" class="settings-link" title="Settings">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </a>
+        <div class="user-profile-badge">
+          <div class="avatar" id="userAvatar">--</div>
+          <div class="user-name" id="userName">Loading…</div>
+          <button class="logout-btn" id="logoutBtn">Log out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="card">
+        <h3>My Circles</h3>
+        <ul class="group-list" id="groupList">
+          <li class="empty-hint">Loading groups…</li>
+        </ul>
+        <button class="btn-outline" id="createGroupBtn">+ Create Group</button>
+      </div>
+    </aside>
+
+    <section class="feed">
+      <div class="card create-post">
+        <textarea id="postInput" placeholder="What's on your mind?"></textarea>
+        <div class="create-post-footer">
+          <div class="media-actions">
+            <button class="btn-attach" id="photoBtn" type="button">📷 Photo / Video</button>
+          </div>
+          <button class="btn-primary" id="submitPostBtn" disabled>Post</button>
+        </div>
+      </div>
+
+      <div id="feedContainer" style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="status-banner" id="feedStatus">Loading posts…</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Group edit modal -->
+  <div class="modal-overlay" id="groupModal">
+    <div class="modal">
+      <h3 id="groupModalTitle">Group</h3>
+      <div class="owner-tag" id="groupOwnerTag"></div>
+
+      <div id="groupEditFields" style="display:none;">
+        <label>Group name</label>
+        <input type="text" id="groupNameInput">
+        <label>Description</label>
+        <textarea id="groupDescInput"></textarea>
+      </div>
+
+      <label style="margin-top:16px;">Members</label>
+      <ul class="member-list" id="memberList"></ul>
+
+      <div id="groupOwnerActions" style="display:none;">
+        <button class="btn-outline" id="addMemberBtn" style="margin-top:12px;">+ Add member</button>
+        <div class="modal-actions">
+          <button class="modal-close" id="groupModalClose">Close</button>
+          <button class="modal-save" id="groupSaveBtn">Save changes</button>
+        </div>
+        <button class="modal-delete" id="groupDeleteBtn">Delete group</button>
+      </div>
+      <div id="groupMemberActions" style="display:none;">
+        <div class="modal-actions">
+          <button class="modal-close" id="groupModalClose2" style="flex:1;">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const token = localStorage.getItem('jwt_token');
+  if (!token) window.location.href = '/login';
+
+  const authHeaders = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+  let currentUser = null;
+
+  const postInput = document.getElementById('postInput');
+  const submitPostBtn = document.getElementById('submitPostBtn');
+  const feedContainer = document.getElementById('feedContainer');
+  const feedStatus = document.getElementById('feedStatus');
+  const createGroupBtn = document.getElementById('createGroupBtn');
+  const groupList = document.getElementById('groupList');
+  const userAvatar = document.getElementById('userAvatar');
+  const userName = document.getElementById('userName');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const photoBtn = document.getElementById('photoBtn');
+  const toast = document.getElementById('toast');
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+  function escapeHTML(str){
+    return String(str).replace(/[&<>'"]/g, tag => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[tag] || tag));
+  }
+  function timeAgo(dateStr){
+    const d = new Date(dateStr);
+    const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (seconds < 60) return 'just now';
+    const mins = Math.floor(seconds / 60);
+    if (mins < 60) return mins + 'm ago';
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + 'h ago';
+    return Math.floor(hrs / 24) + 'd ago';
+  }
+
+  async function apiFetch(url, options = {}) {
+    const res = await fetch(url, { ...options, headers: { ...authHeaders, ...(options.headers || {}) } });
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem('jwt_token');
+      window.location.href = '/login';
+      throw new Error('Not authenticated');
+    }
+    return res;
+  }
+
+  async function loadCurrentUser(){
+    try {
+      const res = await apiFetch('/api/users/me');
+      currentUser = await res.json();
+      userName.textContent = currentUser.username;
+      if (currentUser.avatarUrl) {
+        userAvatar.innerHTML = `<img src="${currentUser.avatarUrl}" alt="me">`;
+      } else {
+        userAvatar.textContent = currentUser.username.slice(0, 2).toUpperCase();
+      }
+    } catch (err) { console.error(err); }
+  }
+
+  photoBtn.addEventListener('click', () => {
+    showToast("Photo/video upload isn't wired up for posts yet — text posts work fine for now.");
+  });
+
+  postInput.addEventListener('input', () => {
+    submitPostBtn.disabled = postInput.value.trim().length === 0;
+  });
+
+  submitPostBtn.addEventListener('click', async () => {
+    const content = postInput.value.trim();
+    if (!content) return;
+    submitPostBtn.disabled = true;
+    submitPostBtn.textContent = 'Posting…';
+    try {
+      const res = await apiFetch('/api/posts', { method: 'POST', body: JSON.stringify({ content }) });
+      if (!res.ok) throw new Error();
+      const post = await res.json();
+      postInput.value = '';
+      prependPost(post);
+      showToast('Posted!');
+    } catch (err) {
+      showToast('Could not create post. Try again.');
+    } finally {
+      submitPostBtn.textContent = 'Post';
+      submitPostBtn.disabled = postInput.value.trim().length === 0;
+    }
+  });
+
+  async function loadFeed(){
+    try {
+      const res = await apiFetch('/api/posts?page=0&size=20');
+      const data = await res.json();
+      const posts = data.content || [];
+      feedContainer.innerHTML = '';
+      if (posts.length === 0) {
+        feedContainer.innerHTML = '<div class="status-banner">No posts yet — be the first to share something!</div>';
+        return;
+      }
+      posts.forEach(p => feedContainer.appendChild(renderPostElement(p)));
+    } catch (err) {
+      feedContainer.innerHTML = '<div class="status-banner error">Could not load the feed. Refresh to try again.</div>';
+    }
+  }
+
+  function prependPost(post){
+    const emptyMsg = feedContainer.querySelector('.status-banner');
+    if (emptyMsg) emptyMsg.remove();
+    feedContainer.insertBefore(renderPostElement(post), feedContainer.firstChild);
+  }
+
+  function renderPostElement(post){
+    const el = document.createElement('article');
+    el.className = 'card post';
+    el.dataset.postId = post.id;
+    const isMine = currentUser && post.authorId === currentUser.id;
+    const initials = (post.authorName || '?').slice(0, 2).toUpperCase();
+    const liked = currentUser && (post.likedByUserIds || []).includes(currentUser.id);
+
+    el.innerHTML = `
+      <div class="post-header">
+        <div class="author-info">
+          <div class="avatar">${escapeHTML(initials)}</div>
+          <div>
+            <div class="author-name">${escapeHTML(post.authorName)}</div>
+            <div class="post-time">${timeAgo(post.createdAt)}</div>
+            ${post.sharedFromAuthorName ? `<div class="shared-tag">🔁 shared from ${escapeHTML(post.sharedFromAuthorName)}</div>` : ''}
+          </div>
+        </div>
+        ${isMine ? `<button class="btn-delete" data-action="delete">Delete</button>` : ''}
+      </div>
+      <div class="post-content">${escapeHTML(post.content)}</div>
+      <div class="post-actions-bar">
+        <button class="btn-reaction ${liked ? 'active-like' : ''}" data-action="like">❤️ <span class="like-count">${(post.likedByUserIds || []).length}</span></button>
+        <button class="btn-reaction" data-action="share">🔁 Share</button>
+        <button class="btn-reaction" data-action="toggle-comments">💬 Comments</button>
+      </div>
+      <div class="comments-wrapper" style="display:none">
+        <div class="comment-list"><div class="empty-hint">Loading comments…</div></div>
+        <form class="add-comment" data-action="add-comment">
+          <input type="text" placeholder="Write a comment..." required>
+          <button type="submit" class="btn-comment">Send</button>
+        </form>
+      </div>
+    `;
+
+    el.querySelector('[data-action="delete"]')?.addEventListener('click', () => deletePost(post.id, el));
+    el.querySelector('[data-action="like"]').addEventListener('click', () => toggleLike(post.id, el));
+    el.querySelector('[data-action="share"]').addEventListener('click', () => sharePost(post.id));
+    el.querySelector('[data-action="toggle-comments"]').addEventListener('click', () => toggleComments(post.id, el));
+    el.querySelector('[data-action="add-comment"]').addEventListener('submit', (e) => addComment(e, post.id, el));
+    return el;
+  }
+
+  async function deletePost(postId, el){
+    if (!confirm('Delete this post?')) return;
+    try {
+      const res = await apiFetch(`/api/posts/${postId}`, { method: 'DELETE' });
+      if (!res.ok && res.status !== 204) throw new Error();
+      el.remove();
+      showToast('Post deleted');
+    } catch (err) { showToast('Could not delete post'); }
+  }
+
+  async function toggleLike(postId, el){
+    try {
+      const res = await apiFetch(`/api/posts/${postId}/like`, { method: 'POST' });
+      const post = await res.json();
+      const btn = el.querySelector('[data-action="like"]');
+      const count = btn.querySelector('.like-count');
+      const liked = currentUser && (post.likedByUserIds || []).includes(currentUser.id);
+      count.textContent = (post.likedByUserIds || []).length;
+      btn.classList.toggle('active-like', liked);
+    } catch (err) { showToast('Could not update like'); }
+  }
+
+  async function sharePost(postId){
+    try {
+      const res = await apiFetch(`/api/posts/${postId}/share`, { method: 'POST' });
+      const shared = await res.json();
+      prependPost(shared);
+      showToast('Shared to your feed');
+    } catch (err) { showToast('Could not share post'); }
+  }
+
+  async function toggleComments(postId, el){
+    const wrapper = el.querySelector('.comments-wrapper');
+    const isHidden = wrapper.style.display === 'none';
+    wrapper.style.display = isHidden ? 'block' : 'none';
+    if (isHidden && !wrapper.dataset.loaded) {
+      await loadComments(postId, el);
+      wrapper.dataset.loaded = 'true';
+    }
+  }
+
+  async function loadComments(postId, el){
+    const list = el.querySelector('.comment-list');
+    try {
+      const res = await apiFetch(`/api/posts/${postId}/comments`);
+      const comments = await res.json();
+      list.innerHTML = comments.length
+        ? comments.map(c => `<div class="comment-item"><span class="comment-author">${escapeHTML(c.authorName)}:</span><span>${escapeHTML(c.content)}</span></div>`).join('')
+        : '<div class="empty-hint">No comments yet.</div>';
+    } catch (err) { list.innerHTML = '<div class="empty-hint">Could not load comments.</div>'; }
+  }
+
+  async function addComment(e, postId, el){
+    e.preventDefault();
+    const input = e.target.querySelector('input');
+    const content = input.value.trim();
+    if (!content) return;
+    try {
+      const res = await apiFetch(`/api/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ content }) });
+      const comment = await res.json();
+      const list = el.querySelector('.comment-list');
+      const emptyHint = list.querySelector('.empty-hint');
+      if (emptyHint) emptyHint.remove();
+      list.insertAdjacentHTML('beforeend', `<div class="comment-item"><span class="comment-author">${escapeHTML(comment.authorName)}:</span><span>${escapeHTML(comment.content)}</span></div>`);
+      input.value = '';
+    } catch (err) { showToast('Could not post comment'); }
+  }
+
+  // ---------- Groups ----------
+  async function loadGroups(){
+    try {
+      const res = await apiFetch('/api/groups/mine');
+      const groups = await res.json();
+      groupList.innerHTML = groups.length
+        ? groups.map(g => `<li class="group-item" data-group-id="${g.id}">⭕ ${escapeHTML(g.name)}</li>`).join('')
+        : '<li class="empty-hint">You haven\'t joined any groups yet.</li>';
+
+      groupList.querySelectorAll('.group-item').forEach(item => {
+        item.addEventListener('click', () => openGroupModal(item.dataset.groupId));
+      });
+    } catch (err) {
+      groupList.innerHTML = '<li class="empty-hint">Could not load groups.</li>';
+    }
+  }
+
+  createGroupBtn.addEventListener('click', async () => {
+    const name = prompt('Group name:');
+    if (!name || !name.trim()) return;
+    const description = prompt('Short description (optional):') || '';
+    createGroupBtn.disabled = true;
+    try {
+      const res = await apiFetch('/api/groups', { method: 'POST', body: JSON.stringify({ name: name.trim(), description: description.trim() }) });
+      if (!res.ok) throw new Error();
+      showToast('Group created');
+      await loadGroups();
+    } catch (err) {
+      showToast('Could not create group');
+    } finally {
+      createGroupBtn.disabled = false;
+    }
+  });
+
+  // ---------- Group edit modal ----------
+  const groupModal = document.getElementById('groupModal');
+  const groupModalTitle = document.getElementById('groupModalTitle');
+  const groupOwnerTag = document.getElementById('groupOwnerTag');
+  const groupEditFields = document.getElementById('groupEditFields');
+  const groupNameInput = document.getElementById('groupNameInput');
+  const groupDescInput = document.getElementById('groupDescInput');
+  const memberList = document.getElementById('memberList');
+  const groupOwnerActions = document.getElementById('groupOwnerActions');
+  const groupMemberActions = document.getElementById('groupMemberActions');
+  const addMemberBtn = document.getElementById('addMemberBtn');
+  const groupSaveBtn = document.getElementById('groupSaveBtn');
+  const groupDeleteBtn = document.getElementById('groupDeleteBtn');
+
+  let activeGroupId = null;
+  let activeGroupIsOwner = false;
+
+  async function openGroupModal(groupId){
+    activeGroupId = groupId;
+    groupModal.classList.add('open');
+    groupModalTitle.textContent = 'Loading…';
+    memberList.innerHTML = '';
+    groupOwnerActions.style.display = 'none';
+    groupMemberActions.style.display = 'none';
+    groupEditFields.style.display = 'none';
+
+    try {
+      const res = await apiFetch(`/api/groups/${groupId}`);
+      if (!res.ok) throw new Error();
+      const detail = await res.json();
+
+      activeGroupIsOwner = currentUser && detail.ownerId === currentUser.id;
+      groupModalTitle.textContent = detail.name;
+      groupOwnerTag.textContent = `Owned by ${detail.ownerUsername}`;
+
+      if (activeGroupIsOwner) {
+        groupEditFields.style.display = 'block';
+        groupNameInput.value = detail.name;
+        groupDescInput.value = detail.description || '';
+        groupOwnerActions.style.display = 'block';
+      } else {
+        groupMemberActions.style.display = 'block';
+      }
+
+      memberList.innerHTML = detail.members.map(m => `
+        <li class="member-row">
+          <span>${escapeHTML(m.username)} ${m.id === detail.ownerId ? '<span class="owner-badge">OWNER</span>' : ''}</span>
+          ${activeGroupIsOwner && m.id !== detail.ownerId ? `<button class="remove-member-btn" data-member-id="${m.id}">Remove</button>` : ''}
+        </li>
+      `).join('');
+
+      memberList.querySelectorAll('.remove-member-btn').forEach(btn => {
+        btn.addEventListener('click', () => removeMember(btn.dataset.memberId));
+      });
+
+    } catch (err) {
+      groupModalTitle.textContent = 'Could not load group';
+    }
+  }
+
+  function closeGroupModal(){
+    groupModal.classList.remove('open');
+    activeGroupId = null;
+  }
+  document.getElementById('groupModalClose').addEventListener('click', closeGroupModal);
+  document.getElementById('groupModalClose2').addEventListener('click', closeGroupModal);
+
+  groupSaveBtn.addEventListener('click', async () => {
+    if (!activeGroupId) return;
+    try {
+      const res = await apiFetch(`/api/groups/${activeGroupId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ name: groupNameInput.value.trim(), description: groupDescInput.value.trim() })
+      });
+      if (!res.ok) throw new Error();
+      showToast('Group updated');
+      closeGroupModal();
+      await loadGroups();
+    } catch (err) {
+      showToast('Could not update group');
+    }
+  });
+
+  groupDeleteBtn.addEventListener('click', async () => {
+    if (!activeGroupId || !confirm('Delete this group? This cannot be undone.')) return;
+    try {
+      const res = await apiFetch(`/api/groups/${activeGroupId}`, { method: 'DELETE' });
+      if (!res.ok && res.status !== 204) throw new Error();
+      showToast('Group deleted');
+      closeGroupModal();
+      await loadGroups();
+    } catch (err) {
+      showToast('Could not delete group');
+    }
+  });
+
+  addMemberBtn.addEventListener('click', async () => {
+    if (!activeGroupId) return;
+    try {
+      const res = await apiFetch('/api/users');
+      const users = await res.json();
+      const username = prompt('Username to add:\n\n' + users.map(u => u.username).join(', '));
+      if (!username) return;
+      const match = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase());
+      if (!match) { showToast('No user with that username'); return; }
+
+      const addRes = await apiFetch(`/api/groups/${activeGroupId}/members/${match.id}`, { method: 'POST' });
+      if (!addRes.ok) throw new Error();
+      showToast('Member added');
+      openGroupModal(activeGroupId);
+    } catch (err) {
+      showToast('Could not add member');
+    }
+  });
+
+  async function removeMember(memberId){
+    if (!activeGroupId || !confirm('Remove this member from the group?')) return;
+    try {
+      const res = await apiFetch(`/api/groups/${activeGroupId}/members/${memberId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      showToast('Member removed');
+      openGroupModal(activeGroupId);
+    } catch (err) {
+      showToast('Could not remove member');
+    }
+  }
+
+  logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('jwt_token');
+    window.location.href = '/login';
+  });
+
+  (async () => {
+    await loadCurrentUser();
+    await Promise.all([loadFeed(), loadGroups()]);
+  })();
+</script>
+
+</body>
+</html>

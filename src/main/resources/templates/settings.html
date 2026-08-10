@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Adam — Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink-deep: #E64980;
+    --pink-mid: #FF8FAE;
+    --pink-soft: #FFD6E4;
+    --blush: #FFF3F7;
+    --white: #FFFFFF;
+    --ink: #3A2430;
+    --ink-soft: #8C6A78;
+    --error: #D9376E;
+    --gray-bg: #FAF8F9;
+    --border: #F3D3E0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--gray-bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-container {
+    max-width: 700px; margin: 0 auto; padding: 14px 20px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .back-link{
+    display:flex; align-items:center; justify-content:center;
+    width: 34px; height: 34px; border-radius: 50%;
+    color: var(--ink-soft); text-decoration:none; font-size: 18px;
+    flex-shrink: 0;
+  }
+  .back-link:hover{ background: var(--blush); color: var(--pink-deep); }
+  .page-title{ font-family:'Fraunces', serif; font-size: 20px; font-weight:700; }
+
+  .wrap{ max-width: 700px; margin: 24px auto; padding: 0 20px 60px; display: flex; flex-direction: column; gap: 20px; }
+  .card {
+    background: var(--white); border-radius: 16px; padding: 24px; border: 1px solid var(--border);
+  }
+  .card h3{ font-family:'Fraunces', serif; font-size: 17px; margin-bottom: 4px; }
+  .card .card-sub{ font-size: 12.5px; color: var(--ink-soft); margin-bottom: 20px; }
+
+  /* Avatar upload */
+  .avatar-row{ display:flex; align-items:center; gap: 20px; }
+  .avatar-preview{
+    width: 84px; height: 84px; border-radius: 50%;
+    background: var(--pink-soft); color: var(--pink-deep);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif; font-weight:700; font-size: 30px;
+    overflow: hidden; flex-shrink: 0;
+  }
+  .avatar-preview img{ width:100%; height:100%; object-fit:cover; }
+  .avatar-actions{ display:flex; flex-direction:column; gap:8px; }
+  .upload-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    padding: 9px 16px; border-radius: 10px;
+    background: var(--blush); border: 1.5px solid var(--border);
+    color: var(--pink-deep); font-size: 13px; font-weight:700; cursor:pointer; width: fit-content;
+  }
+  .upload-btn:hover{ background: var(--pink-soft); }
+  .upload-hint{ font-size: 11.5px; color: var(--ink-soft); }
+
+  /* Bio */
+  textarea{
+    width:100%; border: 1.5px solid var(--border); background: var(--blush);
+    border-radius: 12px; padding: 12px 14px; font-family: inherit; font-size: 14px;
+    color: var(--ink); resize: vertical; min-height: 80px; outline:none;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  textarea:focus{ border-color: var(--pink-deep); background:#fff; }
+
+  /* Privacy options */
+  .privacy-group{ margin-bottom: 18px; }
+  .privacy-group:last-child{ margin-bottom: 0; }
+  .privacy-label{ font-size: 13.5px; font-weight: 700; margin-bottom: 10px; }
+  .radio-option{
+    display:flex; align-items:flex-start; gap: 10px;
+    padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--border);
+    margin-bottom: 8px; cursor:pointer;
+  }
+  .radio-option:hover{ background: var(--blush); }
+  .radio-option input{ margin-top: 3px; accent-color: var(--pink-deep); }
+  .radio-option .opt-title{ font-size: 13.5px; font-weight: 600; }
+  .radio-option .opt-desc{ font-size: 12px; color: var(--ink-soft); margin-top: 1px; }
+
+  .btn-primary{
+    padding: 11px 22px; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, var(--pink-deep), var(--pink-mid));
+    color: #fff; font-size: 13.5px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 12px -3px rgba(230,73,128,0.4);
+  }
+  .btn-primary:disabled{ opacity: 0.6; cursor: not-allowed; }
+
+  .toast{
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color:#fff; padding: 11px 20px; border-radius: 30px;
+    font-size: 13px; font-weight:600; opacity:0; pointer-events:none;
+    transition: all .25s ease; z-index: 200; max-width: 90vw; text-align: center;
+  }
+  .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 500px){
+    .avatar-row{ flex-direction: column; align-items: flex-start; }
+    .card{ padding: 18px; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <a href="/dashboard" class="back-link" title="Back to dashboard">&#8592;</a>
+      <div class="page-title">Settings</div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- Profile picture -->
+    <div class="card">
+      <h3>Profile picture</h3>
+      <div class="card-sub">JPG, PNG, WEBP, or GIF — up to 5MB</div>
+      <div class="avatar-row">
+        <div class="avatar-preview" id="avatarPreview">--</div>
+        <div class="avatar-actions">
+          <label class="upload-btn">
+            📷 Change picture
+            <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp,image/gif" style="display:none;">
+          </label>
+          <div class="upload-hint" id="uploadStatus"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bio -->
+    <div class="card">
+      <h3>About you</h3>
+      <div class="card-sub">Shown on your profile</div>
+      <textarea id="bioInput" placeholder="Write a short bio..."></textarea>
+    </div>
+
+    <!-- Privacy -->
+    <div class="card">
+      <h3>Privacy</h3>
+      <div class="card-sub">Control who can reach you and see your posts</div>
+
+      <div class="privacy-group">
+        <div class="privacy-label">Who can message me</div>
+        <label class="radio-option">
+          <input type="radio" name="messagePrivacy" value="EVERYONE">
+          <div>
+            <div class="opt-title">Everyone</div>
+            <div class="opt-desc">Any user on Adam can start a conversation with you</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="messagePrivacy" value="NO_ONE">
+          <div>
+            <div class="opt-title">No one</div>
+            <div class="opt-desc">New messages will be blocked (existing conversations still work)</div>
+          </div>
+        </label>
+      </div>
+
+      <div class="privacy-group">
+        <div class="privacy-label">Who can see my posts</div>
+        <label class="radio-option">
+          <input type="radio" name="postVisibility" value="PUBLIC">
+          <div>
+            <div class="opt-title">Public</div>
+            <div class="opt-desc">Your posts appear in everyone's feed</div>
+          </div>
+        </label>
+        <label class="radio-option">
+          <input type="radio" name="postVisibility" value="ONLY_ME">
+          <div>
+            <div class="opt-title">Only me</div>
+            <div class="opt-desc">Your posts are hidden from everyone else's feed</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="saveBtn">Save changes</button>
+  </div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const token = localStorage.getItem('jwt_token');
+  if (!token) window.location.href = '/login';
+
+  const authHeaders = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+
+  const avatarPreview = document.getElementById('avatarPreview');
+  const avatarInput = document.getElementById('avatarInput');
+  const uploadStatus = document.getElementById('uploadStatus');
+  const bioInput = document.getElementById('bioInput');
+  const saveBtn = document.getElementById('saveBtn');
+  const toast = document.getElementById('toast');
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  async function apiFetch(url, options = {}){
+    const res = await fetch(url, { ...options, headers: { ...(options.skipJsonHeader ? {} : authHeaders), ...(options.headers||{}) } });
+    if (res.status === 401 || res.status === 403){
+      localStorage.removeItem('jwt_token');
+      window.location.href = '/login';
+      throw new Error('Not authenticated');
+    }
+    return res;
+  }
+
+  function renderAvatar(user){
+    if (user.avatarUrl) {
+      avatarPreview.innerHTML = `<img src="${user.avatarUrl}" alt="avatar">`;
+    } else {
+      avatarPreview.textContent = (user.username || '?').slice(0, 2).toUpperCase();
+    }
+  }
+
+  async function loadProfile(){
+    try {
+      const res = await apiFetch('/api/users/me');
+      const user = await res.json();
+      renderAvatar(user);
+      bioInput.value = user.bio || '';
+      document.querySelector(`input[name="messagePrivacy"][value="${user.messagePrivacy}"]`).checked = true;
+      document.querySelector(`input[name="postVisibility"][value="${user.postVisibility}"]`).checked = true;
+    } catch (err) {
+      showToast('Could not load your profile');
+    }
+  }
+  loadProfile();
+
+  avatarInput.addEventListener('change', async () => {
+    const file = avatarInput.files[0];
+    if (!file) return;
+
+    uploadStatus.textContent = 'Uploading…';
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/api/users/me/avatar', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token }, // no Content-Type — browser sets multipart boundary itself
+        body: formData
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Upload failed');
+      }
+      const user = await res.json();
+      renderAvatar(user);
+      uploadStatus.textContent = 'Updated!';
+      setTimeout(() => uploadStatus.textContent = '', 2000);
+    } catch (err) {
+      uploadStatus.textContent = err.message;
+    }
+  });
+
+  saveBtn.addEventListener('click', async () => {
+    const messagePrivacy = document.querySelector('input[name="messagePrivacy"]:checked')?.value;
+    const postVisibility = document.querySelector('input[name="postVisibility"]:checked')?.value;
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving…';
+
+    try {
+      const res = await apiFetch('/api/users/me', {
+        method: 'PUT',
+        body: JSON.stringify({
+          bio: bioInput.value,
+          messagePrivacy,
+          postVisibility
+        })
+      });
+      if (!res.ok) throw new Error();
+      showToast('Settings saved');
+    } catch (err) {
+      showToast('Could not save settings');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save changes';
+    }
+  });
+</script>
+
+</body>
+</html>
