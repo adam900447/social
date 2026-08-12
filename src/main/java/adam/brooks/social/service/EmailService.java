@@ -7,35 +7,39 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
+
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${app.base-url}")
+    @Value("${app.base-url:https://social-41ov.onrender.com}")
     private String baseUrl;
 
     @Async
     public void sendVerificationEmail(String toEmail, String username, String token) {
-        try {
-            String verificationLink = baseUrl + "/api/auth/verify?token=" + token;
+        // Explicitly offload to an asynchronous thread task so HTTP thread never blocks
+        CompletableFuture.runAsync(() -> {
+            try {
+                String verificationLink = baseUrl + "/api/auth/verify?token=" + token;
 
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(toEmail);
-            message.setSubject("Confirm your Adam account");
-            message.setText(
-                    "Hi " + username + ",\n\n" +
-                    "Welcome to Adam! Please confirm your email address by clicking the link below:\n\n" +
-                    verificationLink + "\n\n" +
-                    "If you didn't create this account, you can safely ignore this email.\n\n" +
-                    "— The Adam team"
-            );
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setTo(toEmail);
+                message.setSubject("Confirm your Adam account");
+                message.setText(
+                        "Hi " + username + ",\n\n" +
+                        "Welcome to Adam! Please confirm your email address by clicking the link below:\n\n" +
+                        verificationLink + "\n\n" +
+                        "If you didn't create this account, you can safely ignore this email.\n\n" +
+                        "— The Adam team"
+                );
 
-            mailSender.send(message);
-        } catch (Exception e) {
-            // Catches SMTP port blocks on Render without failing the user registration
-            System.err.println("Failed to send verification email to " + toEmail + ": " + e.getMessage());
-        }
+                mailSender.send(message);
+            } catch (Exception e) {
+                System.err.println("Render blocked SMTP or mail failed: " + e.getMessage());
+            }
+        });
     }
 }
