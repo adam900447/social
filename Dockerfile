@@ -11,5 +11,5 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
 # Render assigns the port to listen on via the PORT env var at runtime
-EXPOSE 8080
+EXPOSE 8181
 ENTRYPOINT ["java", "-jar", "app.jar"]
