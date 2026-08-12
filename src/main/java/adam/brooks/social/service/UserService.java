@@ -33,16 +33,15 @@ public class UserService {
         user.setUsername(req.getUsername());
         user.setEmail(req.getEmail());
         user.setPassword(passwordEncoder.encode(req.getPassword()));
-        user.setVerified(false);
+        
+        // Auto-verify users for now so login isn't blocked by SMTP port limits on Render
+        user.setVerified(true); 
         user.setVerificationToken(UUID.randomUUID().toString());
 
         User saved = userRepository.save(user);
 
-        try {
-            emailService.sendVerificationEmail(saved.getEmail(), saved.getUsername(), saved.getVerificationToken());
-        } catch (Exception e) {
-            System.err.println("Failed to send verification email: " + e.getMessage());
-        }
+        // Async call (with @Async on EmailService, this returns in <1 millisecond)
+        emailService.sendVerificationEmail(saved.getEmail(), saved.getUsername(), saved.getVerificationToken());
 
         return saved;
     }
